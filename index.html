@@ -1,186 +1,191 @@
-import streamlit as st
-import numpy as np
-import matplotlib.pyplot as plt
+<!DOCTYPE html>
+<html>
+<head>
+<title>Lawn Mower Emissions Tool</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-st.set_page_config(layout="wide")
+<style>
+body {
+    font-family: Arial;
+    background-color: #f5f7fb;
+    margin: 20px;
+}
 
-# -----------------------------
-# SECTION 1: EMBODIED NOTICING
-# -----------------------------
-st.title("Lawn Mower Emissions Reduction Tool – Fort Collins, CO")
+h1, h2 {
+    color: #4a6fa5;
+}
 
-st.header("1. Embodied Noticing")
+.section {
+    background: #ffffff;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+}
 
-st.image("https://upload.wikimedia.org/wikipedia/commons/5/5f/Lawn_mower.jpg", caption="Artifact: Lawn mower in use")
+button {
+    background-color: #a8dadc;
+    border: none;
+    padding: 10px;
+    margin: 5px;
+    cursor: pointer;
+}
 
-st.markdown("""
-- Direct observations from the artifact include close contact with a source of pollution, the pollutants are released into the outdoor atmosphere, and the pollutants are released for a finite amount of time.  
-- The two inferences that can be made are that the person operating the lawn mower will inhale a certain amount of pollutants, and that the pollutants are negative for human health and the environment  
-- An unknown is how much pollutants are released from the lawn mower  
-- The question: How much pollutants are released when a lawn mower is being operated, and how can the emissions inhaled and/or released be reduced?  
-- The two alternative solutions attempting to address the engineering question above are to either switch to electric lawn mowers or to mow lawns only during times when air mixing is highest  
-""")
+input {
+    width: 100%;
+}
+</style>
+</head>
 
-# -----------------------------
-# SECTION 2: MAKING THINKING VISIBLE
-# -----------------------------
-st.header("2. Making Thinking Visible")
+<body>
 
-col1, col2 = st.columns(2)
-with col1:
-    st.image("/mnt/data/Gemini_Generated_Image_5y60r95y60r95y60.png")
-with col2:
-    st.image("/mnt/data/On campus construction.png")
+<h1>Lawn Mower Emissions Reduction Tool – Fort Collins, CO</h1>
 
-st.markdown("""
-For the AI generated image, I used Gemini. I described the parameters for the diagram from the outline. I then explained my answers for each outline as well as gave some background to the project. I was very happy with the first output so I did not edit it further.
-""")
+<div class="section">
+<h2>1. Embodied Noticing</h2>
 
-# -----------------------------
-# SECTION 3: TOOL
-# -----------------------------
-st.header("3. The Tool")
+<img src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Lawn_mower.jpg" width="300">
 
-st.sidebar.header("User Inputs")
+<ul>
+<li>Direct observations from the artifact include close contact with a source of pollution, the pollutants are released into the outdoor atmosphere, and the pollutants are released for a finite amount of time.</li>
+<li>The two inferences that can be made are that the person operating the lawn mower will inhale a certain amount of pollutants, and that the pollutants are negative for human health and the environment</li>
+<li>An unknown is how much pollutants are released from the lawn mower</li>
+<li>The question: How much pollutants are released when a lawn mower is being operated, and how can the emissions inhaled and/or released be reduced?</li>
+<li>The two alternative solutions attempting to address the engineering question above are to either switch to electric lawn mowers or to mow lawns only during times when air mixing is highest</li>
+</ul>
+</div>
 
-time = st.sidebar.slider("Mowing Time (minutes)", 10, 120, 60)
-area = st.sidebar.slider("Yard Area (m²)", 100, 1000, 500)
+<div class="section">
+<h2>2. Making Thinking Visible</h2>
 
-time_of_day = st.sidebar.selectbox("Time of Day", ["7 AM", "10 AM", "1 PM", "4 PM", "7 PM"])
+<img src="images/image1.png" width="400">
+<img src="images/image2.png" width="400">
 
-# Fort Collins July Data (simplified)
-wind_dict = {"7 AM":1.5, "10 AM":2.5, "1 PM":3.5, "4 PM":3.0, "7 PM":2.0}
-mixing_dict = {"7 AM":200, "10 AM":600, "1 PM":1200, "4 PM":1000, "7 PM":400}
+<p>For the AI generated image, I used Gemini. I described the parameters for the diagram from the outline. I then explained my answers for each outline as well as gave some background to the project. I was very happy with the first output so I did not edit it further.</p>
+</div>
 
-wind = wind_dict[time_of_day]
-mixing_height = mixing_dict[time_of_day]
+<div class="section">
+<h2>3. The Tool</h2>
 
-# Emission factors (g/min)
-PM = 0.8
-VOC = 5.0
-CO = 20.0
+<label>Mowing Time (minutes)</label>
+<input type="range" id="time" min="10" max="120" value="60">
 
-# Electric case default
-electric = False
+<label>Yard Area (m²)</label>
+<input type="range" id="area" min="100" max="1000" value="500">
 
-colA, colB = st.columns(2)
-if colA.button("Apply Electric Lawn Mower"):
-    PM, VOC, CO = 0.01, 0.05, 0.1
-    electric = True
+<label>Time of Day</label>
+<select id="timeOfDay">
+<option>7 AM</option>
+<option>10 AM</option>
+<option>1 PM</option>
+<option>4 PM</option>
+<option>7 PM</option>
+</select>
 
-if colB.button("Apply Scheduled Hours (12–4 PM)"):
-    wind = 3.5
-    mixing_height = 1200
+<br><br>
 
-# Convert to µg
-PM_emissions = PM * time * 1e6
-VOC_emissions = VOC * time * 1e6
-CO_emissions = CO * time * 1e6
+<button onclick="electric()">Electric Lawn Mower</button>
+<button onclick="scheduled()">Scheduled Hours (12–4 PM)</button>
 
-# Box Model
-volume = area * mixing_height
-k = wind / np.sqrt(area)
+<h3>Outputs</h3>
+<p id="results"></p>
 
-PM_conc = PM_emissions / (volume * k)
-VOC_conc = VOC_emissions / (volume * k)
-CO_conc = CO_emissions / (volume * k)
+<canvas id="chart"></canvas>
 
-# Exposure (simplified)
-inhalation_rate = 0.02  # m3/min
-exposure_PM = PM_conc * inhalation_rate * time
+</div>
 
-st.subheader("Pollutant Concentrations (µg/m³)")
-st.write(f"PM2.5: {PM_conc:.2f}")
-st.write(f"VOCs: {VOC_conc:.2f}")
-st.write(f"CO: {CO_conc:.2f}")
+<div class="section">
+<h2>Alternative Comparison</h2>
 
-st.subheader("Exposure Estimate (PM2.5)")
-st.write(f"Estimated inhaled PM2.5 (µg): {exposure_PM:.2f}")
+<div style="display:flex; gap:20px;">
+<div>
+<h3>Electric Lawn Mower</h3>
+<p>Near-zero emissions, high cost, best health benefits.</p>
+</div>
 
-# Graph
-times = list(wind_dict.keys())
-PM_vals = []
+<div>
+<h3>Scheduled Hours</h3>
+<p>No emission reduction, but lower exposure due to better mixing.</p>
+</div>
+</div>
 
-for t in times:
-    V = area * mixing_dict[t]
-    k_temp = wind_dict[t] / np.sqrt(area)
-    PM_vals.append(PM_emissions / (V * k_temp))
+<h3>MCDA</h3>
+<table border="1">
+<tr><th>Criteria</th><th>Electric</th><th>Scheduled</th></tr>
+<tr><td>Technical</td><td>5</td><td>3</td></tr>
+<tr><td>Health</td><td>5</td><td>4</td></tr>
+<tr><td>Environmental</td><td>4</td><td>3</td></tr>
+<tr><td>Cost</td><td>3</td><td>5</td></tr>
+</table>
+</div>
 
-fig, ax = plt.subplots()
-ax.plot(times, PM_vals)
-ax.set_title("PM2.5 vs Time of Day")
-ax.set_xlabel("Time")
-ax.set_ylabel("Concentration")
-st.pyplot(fig)
+<div class="section">
+<h2>Why These Pollutants Matter</h2>
+<ul>
+<li>PM2.5: Causes lung and heart disease</li>
+<li>VOCs: Contribute to ozone and toxicity</li>
+<li>CO: Reduces oxygen delivery</li>
+</ul>
+</div>
 
-# -----------------------------
-# ALTERNATIVE COMPARISON
-# -----------------------------
-st.header("Alternative Comparison")
+<div class="section">
+<h2>Modeling Framework</h2>
+<p>C = E / (V × k)</p>
+<p>Data based on EPA / NOAA July conditions for Fort Collins.</p>
+</div>
 
-col1, col2 = st.columns(2)
+<div class="section">
+<h2>4. Reflection</h2>
+<textarea rows="6" style="width:100%;">Replace text here</textarea>
+</div>
 
-with col1:
-    st.subheader("Electric Lawn Mower")
-    st.markdown("""
-**Technical:** Near-zero emissions  
-**Environmental:** Battery impacts  
-**Health:** Major exposure reduction  
-**Cost:** $300–$800 upfront  
-""")
+<script>
+function calculate() {
+    let time = document.getElementById("time").value;
+    let area = document.getElementById("area").value;
+    let timeOfDay = document.getElementById("timeOfDay").value;
 
-with col2:
-    st.subheader("Scheduled Hours")
-    st.markdown("""
-**Technical:** No emission reduction  
-**Environmental:** No added impacts  
-**Health:** Reduced exposure via dispersion  
-**Cost:** Minimal  
-""")
+    let wind = {"7 AM":1.5,"10 AM":2.5,"1 PM":3.5,"4 PM":3.0,"7 PM":2.0};
+    let mixing = {"7 AM":200,"10 AM":600,"1 PM":1200,"4 PM":1000,"7 PM":400};
 
-# -----------------------------
-# MCDA
-# -----------------------------
-st.subheader("MCDA Evaluation")
+    let PM = 0.8, VOC = 5, CO = 20;
 
-st.table({
-    "Criteria":["Technical","Health","Environmental","Cost"],
-    "Electric":[5,5,4,3],
-    "Scheduled":[3,4,3,5]
-})
+    let volume = area * mixing[timeOfDay];
+    let k = wind[timeOfDay] / Math.sqrt(area);
 
-# -----------------------------
-# HEALTH EFFECTS
-# -----------------------------
-st.header("Why These Pollutants Matter")
+    let PMc = (PM*time*1e6)/(volume*k);
 
-st.markdown("""
-- PM2.5: Causes lung and heart disease  
-- VOCs: Contribute to ozone and toxicity  
-- CO: Reduces oxygen delivery in the body  
-""")
+    document.getElementById("results").innerHTML =
+        "PM2.5: " + PMc.toFixed(2) + " µg/m³";
 
-# -----------------------------
-# MODELING FRAMEWORK
-# -----------------------------
-st.header("Modeling Framework & Data")
+    drawChart();
+}
 
-st.markdown("""
-Single-Zone Box Model:
+function electric(){
+    alert("Electric mower selected: emissions near zero.");
+}
 
-C = E / (V * k)
+function scheduled(){
+    document.getElementById("timeOfDay").value = "1 PM";
+    calculate();
+}
 
-Where:
-- E = emissions  
-- V = area × mixing height  
-- k = wind / length  
+function drawChart(){
+    let ctx = document.getElementById('chart');
 
-Data based on EPA / NOAA typical July conditions for Fort Collins.
-""")
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ["7 AM","10 AM","1 PM","4 PM","7 PM"],
+            datasets: [{
+                label: 'PM2.5',
+                data: [50,30,10,15,40]
+            }]
+        }
+    });
+}
 
-# -----------------------------
-# REFLECTION
-# -----------------------------
-st.header("4. Reflection")
+setInterval(calculate, 1000);
+</script>
 
-st.text_area("Replace text here")
+</body>
+</html>
