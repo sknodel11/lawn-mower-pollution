@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Lawn Mower Emissions Tool</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body {
+    font-family: Arial;
+    background: #eef5f9;
+    margin: 20px;
+}
+
+h1, h2 {
+    color: #3a5a7a;
+}
+
+.section {
+    background: #ffffff;
+    padding: 20px;
+    margin-bottom: 25px;
+    border-radius: 12px;
+}
+
+button {
+    background-color: #a8dadc;
+    border: none;
+    padding: 10px;
+    margin: 5px;
+    cursor: pointer;
+    border-radius: 6px;
+}
+
+.slider {
+    width: 100%;
+}
+
+.flex {
+    display: flex;
+    gap: 20px;
+}
+
+.box {
+    flex: 1;
+    background: #f1f8fb;
+    padding: 15px;
+    border-radius: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Lawn Mower Emissions Reduction Tool – Fort Collins, CO</h1>
+
+<!-- 1. EMBODIED NOTICING -->
+<div class="section">
+<h2>1. Embodied Noticing</h2>
+
+<img src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Lawn_mower.jpg" width="350">
+
+<ul>
+<li>Direct observations from the artifact include close contact with a source of pollution, the pollutants are released into the outdoor atmosphere, and the pollutants are released for a finite amount of time.</li>
+<li>The two inferences that can be made are that the person operating the lawn mower will inhale a certain amount of pollutants, and that the pollutants are negative for human health and the environment</li>
+<li>An unknown is how much pollutants are released from the lawn mower</li>
+<li>The question: How much pollutants are released when a lawn mower is being operated, and how can the emissions inhaled and/or released be reduced?</li>
+<li>The two alternative solutions attempting to address the engineering question above are to either switch to electric lawn mowers or to mow lawns only during times when air mixing is highest</li>
+</ul>
+</div>
+
+<!-- 2. MAKING THINKING VISIBLE -->
+<div class="section">
+<h2>2. Making Thinking Visible</h2>
+
+<img src="diagram1.png" width="400">
+<img src="diagram2.png" width="400">
+
+<p>For the AI generated image, I used Gemini. I described the parameters for the diagram from the outline. I then explained my answers for each outline as well as gave some background to the project. I was very happy with the first output so I did not edit it further.</p>
+</div>
+
+<!-- 3. TOOL -->
+<div class="section">
+<h2>3. The Tool</h2>
+
+<label>Mowing Time (minutes)</label>
+<input type="range" id="time" min="10" max="120" value="60" class="slider">
+
+<label>Yard Area (m²)</label>
+<input type="range" id="area" min="100" max="1000" value="500" class="slider">
+
+<label>Time of Day</label>
+<select id="timeOfDay">
+<option>7 AM</option>
+<option>10 AM</option>
+<option>1 PM</option>
+<option>4 PM</option>
+<option>7 PM</option>
+</select>
+
+<br><br>
+
+<button onclick="applyElectric()">Electric Lawn Mower</button>
+<button onclick="applyScheduled()">Scheduled Hours (12–4 PM)</button>
+
+<h3>Outputs</h3>
+<p id="results"></p>
+
+<canvas id="chart"></canvas>
+
+</div>
+
+<!-- COMPARISON -->
+<div class="section">
+<h2>Alternative Comparison</h2>
+
+<div class="flex">
+
+<div class="box">
+<h3>Electric Lawn Mower</h3>
+
+<b>Technical Effectiveness:</b> Near elimination of PM2.5, VOCs, and CO emissions.<br>
+<b>Environmental:</b> Reduced local pollution but introduces upstream electricity and battery impacts.<br>
+<b>Public Health:</b> Significant reduction in direct exposure for operator and nearby residents.<br>
+<b>Cost & Practicality:</b> $300–$800 upfront, battery replacement required.<br>
+
+</div>
+
+<div class="box">
+<h3>Scheduled Hours (12–4 PM)</h3>
+
+<b>Technical Effectiveness:</b> No reduction in emissions, but concentrations drop due to higher mixing height (~1200 m) and wind (~3.5 m/s).<br>
+<b>Environmental:</b> No added environmental burden.<br>
+<b>Public Health:</b> Reduced exposure due to better dispersion.<br>
+<b>Cost & Practicality:</b> Minimal cost, requires behavior change.<br>
+
+</div>
+
+</div>
+
+<h3>MCDA Evaluation</h3>
+
+<table border="1">
+<tr><th>Criteria</th><th>Weight</th><th>Electric</th><th>Scheduled</th></tr>
+<tr><td>Technical</td><td>0.4</td><td>5</td><td>3</td></tr>
+<tr><td>Health</td><td>0.2</td><td>5</td><td>4</td></tr>
+<tr><td>Environmental</td><td>0.2</td><td>4</td><td>3</td></tr>
+<tr><td>Cost</td><td>0.2</td><td>3</td><td>5</td></tr>
+</table>
+
+<h3>ROM Cost Comparison</h3>
+<ul>
+<li>Electric: $300–$800 mower, $100–$300 battery replacement (source: manufacturer pricing)</li>
+<li>Scheduled: ~$0, behavioral implementation only</li>
+</ul>
+
+</div>
+
+<!-- HEALTH -->
+<div class="section">
+<h2>Why These Pollutants Are Harmful</h2>
+
+<ul>
+<li><b>PM2.5:</b> Penetrates deep into lungs causing respiratory and cardiovascular disease</li>
+<li><b>VOCs:</b> Contribute to ozone formation and can be toxic/carcinogenic</li>
+<li><b>CO:</b> Reduces oxygen delivery in bloodstream</li>
+</ul>
+
+</div>
+
+<!-- MODEL -->
+<div class="section">
+<h2>Modeling Framework & Data</h2>
+
+<p><b>Single-Zone Box Model:</b> C = E / (V × k)</p>
+
+<p>
+E = emission rate × time<br>
+V = area × mixing height<br>
+k = wind speed / characteristic length
+</p>
+
+<p><b>Fort Collins July Data (Representative)</b></p>
+
+<table border="1">
+<tr><th>Time</th><th>Wind (m/s)</th><th>Mixing Height (m)</th></tr>
+<tr><td>7 AM</td><td>1.5</td><td>200</td></tr>
+<tr><td>10 AM</td><td>2.5</td><td>600</td></tr>
+<tr><td>1 PM</td><td>3.5</td><td>1200</td></tr>
+<tr><td>4 PM</td><td>3.0</td><td>1000</td></tr>
+<tr><td>7 PM</td><td>2.0</td><td>400</td></tr>
+</table>
+
+<p>Sources: EPA air quality guidance, NOAA meteorological summaries, NREL wind data.</p>
+
+</div>
+
+<!-- REFLECTION -->
+<div class="section">
+<h2>4. Reflection</h2>
+
+<textarea rows="6" style="width:100%;">Replace text here</textarea>
+
+</div>
+
+<script>
+let chart;
+
+function calculate(PM=0.8, VOC=5, CO=20){
+    let time = document.getElementById("time").value;
+    let area = document.getElementById("area").value;
+    let timeOfDay = document.getElementById("timeOfDay").value;
+
+    let wind = {"7 AM":1.5,"10 AM":2.5,"1 PM":3.5,"4 PM":3.0,"7 PM":2.0};
+    let mixing = {"7 AM":200,"10 AM":600,"1 PM":1200,"4 PM":1000,"7 PM":400};
+
+    let volume = area * mixing[timeOfDay];
+    let k = wind[timeOfDay] / Math.sqrt(area);
+
+    let PMc = (PM*time*1e6)/(volume*k);
+    let VOCc = (VOC*time*1e6)/(volume*k);
+    let COc = (CO*time*1e6)/(volume*k);
+
+    document.getElementById("results").innerHTML =
+        "PM2.5: " + PMc.toFixed(2) + " µg/m³ | VOCs: " + VOCc.toFixed(2) + " µg/m³ | CO: " + COc.toFixed(2) + " µg/m³";
+
+    drawChart(PM, time, area);
+}
+
+function applyElectric(){
+    calculate(0.01,0.05,0.1);
+}
+
+function applyScheduled(){
+    document.getElementById("timeOfDay").value = "1 PM";
+    calculate();
+}
+
+function drawChart(PM, time, area){
+    let labels = ["7 AM","10 AM","1 PM","4 PM","7 PM"];
+    let wind = [1.5,2.5,3.5,3.0,2.0];
+    let mixing = [200,600,1200,1000,400];
+
+    let data = labels.map((t,i)=>{
+        let volume = area * mixing[i];
+        let k = wind[i] / Math.sqrt(area);
+        return (PM*time*1e6)/(volume*k);
+    });
+
+    if(chart) chart.destroy();
+
+    chart = new Chart(document.getElementById("chart"), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'PM2.5 vs Time',
+                data: data
+            }]
+        }
+    });
+}
+
+setInterval(()=>calculate(),1000);
+</script>
+
+</body>
+</html>
