@@ -5,18 +5,23 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-body { font-family: Arial; background: #eef5f9; margin: 20px; }
-h1, h2 { color: #3a5a7a; }
+body {
+    font-family: Arial;
+    margin: 20px;
+    background: linear-gradient(to top, #b7e4c7 40%, #e0f7fa 100%);
+}
+
+h1, h2 { color: #2d6a4f; }
 
 .section {
-    background: #ffffff;
+    background: #ffffffcc;
     padding: 20px;
     margin-bottom: 25px;
     border-radius: 12px;
 }
 
 button {
-    background-color: #a8dadc;
+    background-color: #74c69d;
     border: none;
     padding: 10px;
     margin: 5px;
@@ -25,7 +30,13 @@ button {
 }
 
 .flex { display: flex; gap: 20px; }
-.box { flex: 1; background: #f1f8fb; padding: 15px; border-radius: 10px; }
+
+.box {
+    flex: 1;
+    background: #f1f8fb;
+    padding: 15px;
+    border-radius: 10px;
+}
 
 .value-box {
     display: inline-block;
@@ -41,7 +52,6 @@ button {
 
 <h1>Lawn Mower Emissions Reduction Tool – Fort Collins, CO</h1>
 
-<!-- 1. EMBODIED NOTICING -->
 <div class="section">
 <h2>1. Embodied Noticing</h2>
 
@@ -56,7 +66,6 @@ button {
 </ul>
 </div>
 
-<!-- 2. MAKING THINKING VISIBLE -->
 <div class="section">
 <h2>2. Making Thinking Visible</h2>
 
@@ -66,18 +75,17 @@ button {
 <p>For the AI generated image, I used Gemini. I described the parameters for the diagram from the outline. I then explained my answers for each outline as well as gave some background to the project. I was very happy with the first output so I did not edit it further.</p>
 </div>
 
-<!-- 3. TOOL -->
 <div class="section">
 <h2>3. The Tool</h2>
 
 <p><b>This is a tool designed for the tool 2 assignment in air quality engineering. It calculates emissions released from a typical two-stroke lawn mower in a typical home in Fort Collins. The two alternatives to address the pollution issue is to either switch to electric mowers or to mow at prime times when the air is most mixed. Click the buttons below to see how the values change for each alternative. Sliders are provided to change the yard area and time spent mowing for additional parameters. There is also a time selection box to see how different times of day affect air dispersion. Below the tool there is analysis on the two alternatives as well as a section explaining more about the tool itself.</b></p>
 
 <label>Mowing Time (minutes)</label>
-<input type="range" id="time" min="60" max="180" value="60" oninput="updateValues(); calculate();">
+<input type="range" id="time" min="60" max="180" value="60" oninput="updateValues(); resetMode(); calculate();">
 <span class="value-box" id="timeVal">60</span>
 
 <label>Yard Area (m²)</label>
-<input type="range" id="area" min="500" max="1000" value="500" oninput="updateValues(); calculate();">
+<input type="range" id="area" min="500" max="1000" value="500" oninput="updateValues(); resetMode(); calculate();">
 <span class="value-box" id="areaVal">500</span>
 
 <label>Time of Day</label>
@@ -96,12 +104,12 @@ button {
 
 <h3>Outputs</h3>
 <p id="results"></p>
+<p id="exposure"></p>
 
 <canvas id="chart"></canvas>
 
 </div>
 
-<!-- COMPARISON -->
 <div class="section">
 <h2>Alternative Comparison</h2>
 
@@ -132,6 +140,9 @@ button {
 <tr><td>Cost</td><td>0.2</td><td>3</td><td>5</td></tr>
 </table>
 
+<h3>Technical Effectiveness (% Reduction from Gas Baseline)</h3>
+<p id="reduction"></p>
+
 <h3>ROM Cost Comparison</h3>
 <table border="1">
 <tr>
@@ -139,36 +150,15 @@ button {
 <th>Electric Lawn Mower</th>
 <th>Scheduled Hours</th>
 </tr>
-<tr>
-<td>Capital Equipment</td>
-<td>$300–$800 mower</td>
-<td>$0</td>
-</tr>
-<tr>
-<td>Operation & Maintenance</td>
-<td>$20–$50/year electricity + maintenance</td>
-<td>$0</td>
-</tr>
-<tr>
-<td>Battery Replacement</td>
-<td>$100–$300 every 3–5 years</td>
-<td>$0</td>
-</tr>
-<tr>
-<td>Behavior / Implementation</td>
-<td>Minimal learning curve</td>
-<td>Requires user schedule change</td>
-</tr>
-<tr>
-<td>Source</td>
-<td>Home Depot / manufacturer pricing (ROM estimate)</td>
-<td>Engineering assumption</td>
-</tr>
+<tr><td>Capital Equipment</td><td>$300–$800 mower</td><td>$0</td></tr>
+<tr><td>Operation & Maintenance</td><td>$20–$50/year</td><td>$0</td></tr>
+<tr><td>Battery Replacement</td><td>$100–$300 every 3–5 years</td><td>$0</td></tr>
+<tr><td>Behavior / Implementation</td><td>Minimal</td><td>Requires schedule change</td></tr>
+<tr><td>Source</td><td>Manufacturer pricing</td><td>Engineering assumption</td></tr>
 </table>
 
 </div>
 
-<!-- HEALTH -->
 <div class="section">
 <h2>Why These Pollutants Are Harmful</h2>
 <ul>
@@ -178,7 +168,6 @@ button {
 </ul>
 </div>
 
-<!-- MODEL -->
 <div class="section">
 <h2>Modeling Framework & Data</h2>
 
@@ -189,9 +178,8 @@ V = area × mixing height<br>
 k = wind speed / characteristic length
 </p>
 
-<p><b>Fort Collins July Data</b></p>
 <table border="1">
-<tr><th>Time</th><th>Wind (m/s)</th><th>Mixing Height (m)</th></tr>
+<tr><th>Time</th><th>Wind</th><th>Mixing Height</th></tr>
 <tr><td>7 AM</td><td>1.5</td><td>200</td></tr>
 <tr><td>10 AM</td><td>2.5</td><td>600</td></tr>
 <tr><td>1 PM</td><td>3.5</td><td>1200</td></tr>
@@ -199,11 +187,10 @@ k = wind speed / characteristic length
 <tr><td>7 PM</td><td>2.0</td><td>400</td></tr>
 </table>
 
-<p>Sources: EPA air quality guidance, NOAA meteorological summaries, NREL wind data.</p>
+<p>Sources: EPA, NOAA, NREL</p>
 
 </div>
 
-<!-- REFLECTION -->
 <div class="section">
 <h2>4. Reflection</h2>
 
@@ -215,76 +202,81 @@ Since this project was much more complex than Tool 1, I ran into a lot more chal
 
 <script>
 let chart;
-let currentMode = "gas";
+let currentMode="gas";
 
 function updateValues(){
-    document.getElementById("timeVal").innerText = document.getElementById("time").value;
-    document.getElementById("areaVal").innerText = document.getElementById("area").value;
+document.getElementById("timeVal").innerText=document.getElementById("time").value;
+document.getElementById("areaVal").innerText=document.getElementById("area").value;
 }
 
-function resetMode(){
-    currentMode = "gas";
-}
+function resetMode(){ currentMode="gas"; }
 
-function applyElectric(){
-    currentMode = "electric";
-    calculate();
-}
+function applyElectric(){ currentMode="electric"; calculate(); }
 
 function applyScheduled(){
-    currentMode = "scheduled";
-    document.getElementById("timeOfDay").value = "1 PM";
-    calculate();
+currentMode="scheduled";
+document.getElementById("timeOfDay").value="1 PM";
+calculate();
 }
 
 function calculate(){
-    let time = document.getElementById("time").value;
-    let area = document.getElementById("area").value;
-    let timeOfDay = document.getElementById("timeOfDay").value;
+let time=document.getElementById("time").value;
+let area=document.getElementById("area").value;
+let timeOfDay=document.getElementById("timeOfDay").value;
 
-    let wind = {"7 AM":1.5,"10 AM":2.5,"1 PM":3.5,"4 PM":3.0,"7 PM":2.0};
-    let mixing = {"7 AM":200,"10 AM":600,"1 PM":1200,"4 PM":1000,"7 PM":400};
+let wind={"7 AM":1.5,"10 AM":2.5,"1 PM":3.5,"4 PM":3.0,"7 PM":2.0};
+let mixing={"7 AM":200,"10 AM":600,"1 PM":1200,"4 PM":1000,"7 PM":400};
 
-    let PM=0.8, VOC=5, CO=20;
+let PM=0.8,VOC=5,CO=20;
 
-    if(currentMode==="electric"){
-        PM=0.01; VOC=0.05; CO=0.1;
-    }
+if(currentMode==="electric"){ PM=0.01; VOC=0.05; CO=0.1; }
 
-    if(currentMode==="scheduled"){
-        wind["1 PM"]=3.5;
-    }
+let volume=area*mixing[timeOfDay];
+let k=wind[timeOfDay]/Math.sqrt(area);
 
-    let volume = area * mixing[timeOfDay];
-    let k = wind[timeOfDay] / Math.sqrt(area);
+let PMc=(PM*time*1e6)/(volume*k);
+let VOCc=(VOC*time*1e6)/(volume*k);
+let COc=(CO*time*1e6)/(volume*k);
 
-    let PMc = (PM*time*1e6)/(volume*k);
-    let VOCc = (VOC*time*1e6)/(volume*k);
-    let COc = (CO*time*1e6)/(volume*k);
+document.getElementById("results").innerHTML =
+"PM2.5: "+PMc.toFixed(2)+" µg/m³ | VOCs: "+VOCc.toFixed(2)+" µg/m³ | CO: "+COc.toFixed(2)+" µg/m³";
 
-    document.getElementById("results").innerHTML =
-        "PM2.5: " + PMc.toFixed(2) + " µg/m³ | VOCs: " + VOCc.toFixed(2) + " µg/m³ | CO: " + COc.toFixed(2) + " µg/m³";
+let inhalationRate=0.02;
+let dose=PMc*inhalationRate*time;
 
-    drawChart(PM, time, area);
+document.getElementById("exposure").innerHTML =
+"Estimated PM2.5 Inhaled Dose: "+dose.toFixed(2)+" µg";
+
+let basePM=(0.8*time*1e6)/(volume*k);
+let electricPM=(0.01*time*1e6)/(volume*k);
+let scheduledPM=(0.8*time*1e6)/(area*1200*(3.5/Math.sqrt(area)));
+
+let electricReduction=((basePM-electricPM)/basePM)*100;
+let scheduledReduction=((basePM-scheduledPM)/basePM)*100;
+
+document.getElementById("reduction").innerHTML =
+"Electric Reduction: "+electricReduction.toFixed(1)+"% | Scheduled Reduction: "+scheduledReduction.toFixed(1)+"%";
+
+drawChart(PM,time,area);
 }
 
 function drawChart(PM,time,area){
-    let labels=["7 AM","10 AM","1 PM","4 PM","7 PM"];
-    let wind=[1.5,2.5,3.5,3.0,2.0];
-    let mixing=[200,600,1200,1000,400];
+let labels=["7 AM","10 AM","1 PM","4 PM","7 PM"];
+let wind=[1.5,2.5,3.5,3.0,2.0];
+let mixing=[200,600,1200,1000,400];
 
-    let data=labels.map((t,i)=>{
-        let volume=area*mixing[i];
-        let k=wind[i]/Math.sqrt(area);
-        return (PM*time*1e6)/(volume*k);
-    });
+let data=labels.map((t,i)=>{
+let volume=area*mixing[i];
+let k=wind[i]/Math.sqrt(area);
+return (PM*time*1e6)/(volume*k);
+});
 
-    if(chart) chart.destroy();
+if(chart) chart.destroy();
 
-    chart=new Chart(document.getElementById("chart"),{
-        type:'line',
-        data:{labels:labels,datasets:[{label:'PM2.5 vs Time',data:data}]}
-    });
+chart=new Chart(document.getElementById("chart"),{
+type:'line',
+data:{labels:labels,datasets:[{label:'PM2.5 vs Time',data:data}]}
+});
 }
 
 updateValues();
