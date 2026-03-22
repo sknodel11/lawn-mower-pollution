@@ -5,15 +5,8 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-body {
-    font-family: Arial;
-    background: #eef5f9;
-    margin: 20px;
-}
-
-h1, h2 {
-    color: #3a5a7a;
-}
+body { font-family: Arial; background: #eef5f9; margin: 20px; }
+h1, h2 { color: #3a5a7a; }
 
 .section {
     background: #ffffff;
@@ -31,20 +24,15 @@ button {
     border-radius: 6px;
 }
 
-.slider {
-    width: 100%;
-}
+.flex { display: flex; gap: 20px; }
+.box { flex: 1; background: #f1f8fb; padding: 15px; border-radius: 10px; }
 
-.flex {
-    display: flex;
-    gap: 20px;
-}
-
-.box {
-    flex: 1;
-    background: #f1f8fb;
-    padding: 15px;
-    border-radius: 10px;
+.value-box {
+    display: inline-block;
+    margin-left: 10px;
+    padding: 5px 10px;
+    background: #d9eef2;
+    border-radius: 6px;
 }
 </style>
 </head>
@@ -57,7 +45,7 @@ button {
 <div class="section">
 <h2>1. Embodied Noticing</h2>
 
-<img src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Lawn_mower.jpg" width="350">
+<img src="diagram3.png" width="350">
 
 <ul>
 <li>Direct observations from the artifact include close contact with a source of pollution, the pollutants are released into the outdoor atmosphere, and the pollutants are released for a finite amount of time.</li>
@@ -82,14 +70,18 @@ button {
 <div class="section">
 <h2>3. The Tool</h2>
 
+<p><b>This is a tool designed for the tool 2 assignment in air quality engineering. It calculates emissions released from a typical two-stroke lawn mower in a typical home in Fort Collins. The two alternatives to address the pollution issue is to either switch to electric mowers or to mow at prime times when the air is most mixed. Click the buttons below to see how the values change for each alternative. Sliders are provided to change the yard area and time spent mowing for additional parameters. There is also a time selection box to see how different times of day affect air dispersion. Below the tool there is analysis on the two alternatives as well as a section explaining more about the tool itself.</b></p>
+
 <label>Mowing Time (minutes)</label>
-<input type="range" id="time" min="10" max="120" value="60" class="slider">
+<input type="range" id="time" min="60" max="180" value="60" oninput="updateValues(); calculate();">
+<span class="value-box" id="timeVal">60</span>
 
 <label>Yard Area (m²)</label>
-<input type="range" id="area" min="100" max="1000" value="500" class="slider">
+<input type="range" id="area" min="500" max="1000" value="500" oninput="updateValues(); calculate();">
+<span class="value-box" id="areaVal">500</span>
 
 <label>Time of Day</label>
-<select id="timeOfDay">
+<select id="timeOfDay" onchange="resetMode(); calculate();">
 <option>7 AM</option>
 <option>10 AM</option>
 <option>1 PM</option>
@@ -114,31 +106,24 @@ button {
 <h2>Alternative Comparison</h2>
 
 <div class="flex">
-
 <div class="box">
 <h3>Electric Lawn Mower</h3>
-
 <b>Technical Effectiveness:</b> Near elimination of PM2.5, VOCs, and CO emissions.<br>
 <b>Environmental:</b> Reduced local pollution but introduces upstream electricity and battery impacts.<br>
 <b>Public Health:</b> Significant reduction in direct exposure for operator and nearby residents.<br>
-<b>Cost & Practicality:</b> $300–$800 upfront, battery replacement required.<br>
-
+<b>Cost & Practicality:</b> Requires purchase and battery maintenance.<br>
 </div>
 
 <div class="box">
 <h3>Scheduled Hours (12–4 PM)</h3>
-
-<b>Technical Effectiveness:</b> No reduction in emissions, but concentrations drop due to higher mixing height (~1200 m) and wind (~3.5 m/s).<br>
+<b>Technical Effectiveness:</b> No emission reduction, but concentrations drop due to higher mixing height (~1200 m) and wind (~3.5 m/s).<br>
 <b>Environmental:</b> No added environmental burden.<br>
 <b>Public Health:</b> Reduced exposure due to better dispersion.<br>
 <b>Cost & Practicality:</b> Minimal cost, requires behavior change.<br>
-
 </div>
-
 </div>
 
 <h3>MCDA Evaluation</h3>
-
 <table border="1">
 <tr><th>Criteria</th><th>Weight</th><th>Electric</th><th>Scheduled</th></tr>
 <tr><td>Technical</td><td>0.4</td><td>5</td><td>3</td></tr>
@@ -148,23 +133,49 @@ button {
 </table>
 
 <h3>ROM Cost Comparison</h3>
-<ul>
-<li>Electric: $300–$800 mower, $100–$300 battery replacement (source: manufacturer pricing)</li>
-<li>Scheduled: ~$0, behavioral implementation only</li>
-</ul>
+<table border="1">
+<tr>
+<th>Category</th>
+<th>Electric Lawn Mower</th>
+<th>Scheduled Hours</th>
+</tr>
+<tr>
+<td>Capital Equipment</td>
+<td>$300–$800 mower</td>
+<td>$0</td>
+</tr>
+<tr>
+<td>Operation & Maintenance</td>
+<td>$20–$50/year electricity + maintenance</td>
+<td>$0</td>
+</tr>
+<tr>
+<td>Battery Replacement</td>
+<td>$100–$300 every 3–5 years</td>
+<td>$0</td>
+</tr>
+<tr>
+<td>Behavior / Implementation</td>
+<td>Minimal learning curve</td>
+<td>Requires user schedule change</td>
+</tr>
+<tr>
+<td>Source</td>
+<td>Home Depot / manufacturer pricing (ROM estimate)</td>
+<td>Engineering assumption</td>
+</tr>
+</table>
 
 </div>
 
 <!-- HEALTH -->
 <div class="section">
 <h2>Why These Pollutants Are Harmful</h2>
-
 <ul>
 <li><b>PM2.5:</b> Penetrates deep into lungs causing respiratory and cardiovascular disease</li>
 <li><b>VOCs:</b> Contribute to ozone formation and can be toxic/carcinogenic</li>
 <li><b>CO:</b> Reduces oxygen delivery in bloodstream</li>
 </ul>
-
 </div>
 
 <!-- MODEL -->
@@ -172,15 +183,13 @@ button {
 <h2>Modeling Framework & Data</h2>
 
 <p><b>Single-Zone Box Model:</b> C = E / (V × k)</p>
-
 <p>
 E = emission rate × time<br>
 V = area × mixing height<br>
 k = wind speed / characteristic length
 </p>
 
-<p><b>Fort Collins July Data (Representative)</b></p>
-
+<p><b>Fort Collins July Data</b></p>
 <table border="1">
 <tr><th>Time</th><th>Wind (m/s)</th><th>Mixing Height (m)</th></tr>
 <tr><td>7 AM</td><td>1.5</td><td>200</td></tr>
@@ -198,20 +207,53 @@ k = wind speed / characteristic length
 <div class="section">
 <h2>4. Reflection</h2>
 
-<textarea rows="6" style="width:100%;">Replace text here</textarea>
+<p>For this tool, I focused on pollutants produced from lawn mowers. My focus was on typical two-stroke lawn mowers in a typical family home in Fort Collins. My two alternative solutions that I compared in the tool are switching to electric mowers and to have a scheduled mowing time when air mixing is highest. For Tool 2 I used ChatGPT to help me write my code. I then plugged the code into VScode, polished it, and then pushed it to Github to create a page for my tool. We used a Single-Zone Box Model as a more simplified version of the Gaussian dispersion. We made a table with air mixing values from a typical week in July in Fort Collins from weather records and found average wind dispersion and height per time of day. This made the wind much easier to model per time of day, and therefore easier for the user to use and adjust parameters and to show how the specified mowing time alternative (12-4pm) reduced emissions. 
+The electric lawn mower reduces the most emissions, however the scheduled mowing time does not require a purchase of a new lawnmower (can be costly). My suggestion would be if an electric mower is not in the budget, mowing between the hours of 12-4pm in Fort Collins works best. Where the comparison breaks down is that the release of PM2.5, VOC’s, and CO’s are harder to track from just one mower, and different models of lawn mowers can also vary the release of pollutants greatly, so the real life release of the pollutants provided in the calculator may be different then in real life. Weather, season, person's speed on the mower, elevation, slope of yard, and many other factors may also change the pollutant outputs. This is just a simple model to show a general release of pollutants from a typical lawn mower, and it does a great job comparing how the two alternatives reduce those pollutants. 
+Since this project was much more complex than Tool 1, I ran into a lot more challenges then last time. Just planning how I wanted the tool to look and thinking about the inputs and outputs alone took a lot of thinking and redrafting. Because of the added complexity, coding the project also had a lot more issues. The first batch of code after I gave chatGPT a very long detailed text of instructions didn’t even work. However, I pivoted and looked at the parameters from another perspective, and changed a lot of my expectations. I also reorganised the flow of the tool to make it more user friendly. I finally got a usable code that worked, and from there we just corrected code issues and added in more details to the tool (and made it look clean). Overall this was a huge challenge for me, but I think the tool that came out of all this hard work works pretty well.</p>
 
 </div>
 
 <script>
 let chart;
+let currentMode = "gas";
 
-function calculate(PM=0.8, VOC=5, CO=20){
+function updateValues(){
+    document.getElementById("timeVal").innerText = document.getElementById("time").value;
+    document.getElementById("areaVal").innerText = document.getElementById("area").value;
+}
+
+function resetMode(){
+    currentMode = "gas";
+}
+
+function applyElectric(){
+    currentMode = "electric";
+    calculate();
+}
+
+function applyScheduled(){
+    currentMode = "scheduled";
+    document.getElementById("timeOfDay").value = "1 PM";
+    calculate();
+}
+
+function calculate(){
     let time = document.getElementById("time").value;
     let area = document.getElementById("area").value;
     let timeOfDay = document.getElementById("timeOfDay").value;
 
     let wind = {"7 AM":1.5,"10 AM":2.5,"1 PM":3.5,"4 PM":3.0,"7 PM":2.0};
     let mixing = {"7 AM":200,"10 AM":600,"1 PM":1200,"4 PM":1000,"7 PM":400};
+
+    let PM=0.8, VOC=5, CO=20;
+
+    if(currentMode==="electric"){
+        PM=0.01; VOC=0.05; CO=0.1;
+    }
+
+    if(currentMode==="scheduled"){
+        wind["1 PM"]=3.5;
+    }
 
     let volume = area * mixing[timeOfDay];
     let k = wind[timeOfDay] / Math.sqrt(area);
@@ -226,41 +268,27 @@ function calculate(PM=0.8, VOC=5, CO=20){
     drawChart(PM, time, area);
 }
 
-function applyElectric(){
-    calculate(0.01,0.05,0.1);
-}
+function drawChart(PM,time,area){
+    let labels=["7 AM","10 AM","1 PM","4 PM","7 PM"];
+    let wind=[1.5,2.5,3.5,3.0,2.0];
+    let mixing=[200,600,1200,1000,400];
 
-function applyScheduled(){
-    document.getElementById("timeOfDay").value = "1 PM";
-    calculate();
-}
-
-function drawChart(PM, time, area){
-    let labels = ["7 AM","10 AM","1 PM","4 PM","7 PM"];
-    let wind = [1.5,2.5,3.5,3.0,2.0];
-    let mixing = [200,600,1200,1000,400];
-
-    let data = labels.map((t,i)=>{
-        let volume = area * mixing[i];
-        let k = wind[i] / Math.sqrt(area);
+    let data=labels.map((t,i)=>{
+        let volume=area*mixing[i];
+        let k=wind[i]/Math.sqrt(area);
         return (PM*time*1e6)/(volume*k);
     });
 
     if(chart) chart.destroy();
 
-    chart = new Chart(document.getElementById("chart"), {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'PM2.5 vs Time',
-                data: data
-            }]
-        }
+    chart=new Chart(document.getElementById("chart"),{
+        type:'line',
+        data:{labels:labels,datasets:[{label:'PM2.5 vs Time',data:data}]}
     });
 }
 
-setInterval(()=>calculate(),1000);
+updateValues();
+calculate();
 </script>
 
 </body>
